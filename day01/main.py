@@ -6,6 +6,7 @@ def sliding_window(values, size, fn):
 def count_increases(numbers):
     return sum(sliding_window(numbers, 2, lambda t: t[0] < t[1]))
 
+
 if __name__ == '__main__':
     with open('input.txt') as f:
         values = [int(n) for n in f.readlines()]
