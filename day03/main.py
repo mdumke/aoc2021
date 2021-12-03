@@ -16,7 +16,7 @@ def arg_max(bits):
     return int(sum(bits) >= len(bits) / 2)
 
 def arg_min(bits):
-    return int(not arg_max(bits))
+    return (arg_max(bits) + 1) % 2
 
 def bin2dec(bit_list):
     return int(''.join(map(str, bit_list)), base=2)
