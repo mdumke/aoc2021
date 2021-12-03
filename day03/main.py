@@ -29,11 +29,12 @@ def column_map(report, fn):
 
 def filter_down(report, criterion):
     rest = report
-    for i in range(len(report[0])):
+    i = 0
+    while len(rest) > 1:
         target_bit = criterion(transpose(rest)[i])
         rest = [row for row in rest if row[i] == target_bit]
-        if len(rest) <= 1:
-            return rest[0]
+        i += 1
+    return rest[0]
 
 
 if __name__ == '__main__':
