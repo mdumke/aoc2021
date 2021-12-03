@@ -39,7 +39,7 @@ def filter_down(report, criterion):
 
 if __name__ == '__main__':
     with open('input.txt') as f:
-        report = [[int(c) for c in list(l.strip())] for l in f.readlines()]
+        report = [[int(bit) for bit in l.strip()] for l in f.readlines()]
 
     print('part 1:', gamma(report) * epsilon(report))
     print('part 2:', oxygen(report) * co2(report))
