@@ -29,9 +29,9 @@ def column_map(report, fn):
 
 def filter_down(report, criterion):
     rest = report
-    for i in range(len(report)):
-        bit = criterion(transpose(rest)[i])
-        rest = [r for r in rest if r[i] == bit]
+    for i in range(len(report[0])):
+        target_bit = criterion(transpose(rest)[i])
+        rest = [row for row in rest if row[i] == target_bit]
         if len(rest) <= 1:
             return rest[0]
 
