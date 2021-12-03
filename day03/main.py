@@ -1,10 +1,10 @@
 """Day 3: Binary Diagnostic"""
 
 def gamma(report):
-    return bin2dec(bits_by_column(report, arg_max))
+    return bin2dec(column_map(report, arg_max))
 
 def epsilon(report):
-    return bin2dec(bits_by_column(report, arg_min))
+    return bin2dec(column_map(report, arg_min))
 
 def oxygen(report):
     return bin2dec(filter_down(report, arg_max))
@@ -24,8 +24,8 @@ def bin2dec(bit_list):
 def transpose(matrix):
     return list(zip(*matrix))
 
-def bits_by_column(report, criterion):
-    return [criterion(transpose(report)[i]) for i in range(len(report[0]))]
+def column_map(report, fn):
+    return [fn(col) for col in transpose(report)]
 
 def filter_down(report, criterion):
     rest = report
