@@ -8,6 +8,7 @@ class Matrix(list):
     def fill(fill_value, shape):
         return Matrix([[fill_value for _ in range(shape[1])]
                                    for _ in range(shape[0])])
+
     @property
     def shape(self):
         return len(self), len(self[0])
@@ -53,21 +54,16 @@ class Board(Matrix):
         return sum(compress(self.flatten(), self.marks.flatten()))
 
 
-def play_to_win(boards, draws):
+def play(boards, draws, win=True):
     for draw in draws:
         for board in boards:
             board.mark(draw)
             if board.bingo:
-                return draw * board.score()
-
-def play_to_loose(boards, draws):
-    for draw in draws:
-        for board in boards:
-            board.mark(draw)
-            if board.bingo:
-                boards = [b for b in boards if not b.bingo]
-                if len(boards) == 0:
+                if len(boards) == 1 or win:
                     return draw * board.score()
+                boards = [b for b in boards if not b.bingo]
+                continue
+
 
 def load_data(filename):
     with open(filename) as f:
@@ -81,6 +77,6 @@ def load_data(filename):
 
 if __name__ == '__main__':
     boards, draws = load_data('input.txt')
-    print('part 1:', play_to_win([Board(b) for b in boards], draws))
-    print('part 2:', play_to_loose([Board(b) for b in boards], draws))
+    print('part 1:', play([Board(b) for b in boards], draws))
+    print('part 2:', play([Board(b) for b in boards], draws, False))
 
