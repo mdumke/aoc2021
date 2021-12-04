@@ -46,15 +46,14 @@ class Board(Matrix):
         return sum(compress(self.flatten(), self.marks.flatten()))
 
 
-def play(boards, draws, win=True):
+def play(boards, draws, play_to_win=True):
     for draw in draws:
         for board in boards:
             board.mark(draw)
-            if board.bingo:
-                if len(boards) == 1 or win:
-                    return draw * board.score()
-                boards = [b for b in boards if not b.bingo]
-                continue
+            if board.bingo and play_to_win or len(boards) == 1:
+                return draw * board.score()
+            boards = [b for b in boards if not b.bingo]
+            continue
 
 
 def load_data(filename):
