@@ -1,37 +1,56 @@
 """Day 4: Giant Squid"""
 
-from itertools import compress, chain, product
+from itertools import chain, compress
 
 
-class Board:
+class Matrix(list):
+    @staticmethod
+    def fill(fill_value, shape):
+        return Matrix([[fill_value for _ in range(shape[1])]
+                                   for _ in range(shape[0])])
+    @property
+    def shape(self):
+        return len(self), len(self[0])
+
+    def indices(self):
+        return ((i, j) for i in range(len(self))
+                       for j in range(len(self[0])))
+
+    def transpose(self):
+        return Matrix(zip(*self))
+
+    def flatten(self):
+        return chain.from_iterable(self)
+
+    def get_row(self, row):
+        return self[row]
+
+    def get_col(self, col):
+        return self.transpose()[col]
+
+    def find(self, value):
+        for i, j in self.indices():
+            if self[i][j] == value:
+                return i, j
+
+
+class Board(Matrix):
     def __init__(self, numbers):
-        self.numbers = numbers
+        Matrix.__init__(self, numbers)
         self.bingo = False
-        self.marks = [[1, 1, 1, 1, 1],
-                      [1, 1, 1, 1, 1],
-                      [1, 1, 1, 1, 1],
-                      [1, 1, 1, 1, 1],
-                      [1, 1, 1, 1, 1]]
+        self.marks = Matrix.fill(1, shape=self.shape)
 
     def mark(self, number):
-        for row, col in product(range(5), repeat=2):
-            if self.numbers[row][col] == number:
-                self.marks[row][col] = 0
-                self.check_bingo(row, col)
+        if (pos := self.find(number)):
+            self.marks[pos[0]][pos[1]] = 0
+            self.check_bingo(pos[0], pos[1])
 
     def check_bingo(self, row, col):
-        self.bingo |= sum(self.marks[row]) == 0 or \
-                      sum(self.transpose(self.marks)[col]) == 0
-
-    def transpose(self, matrix):
-        return list(zip(*matrix))
-
-    def flatten(self, matrix):
-        return chain.from_iterable(matrix)
+        self.bingo |= sum(self.marks.get_row(row)) == 0 or \
+                      sum(self.marks.get_col(col)) == 0
 
     def score(self):
-        return sum(compress(self.flatten(self.numbers),
-                            self.flatten(self.marks)))
+        return sum(compress(self.flatten(), self.marks.flatten()))
 
 
 def play_to_win(boards, draws):
@@ -55,13 +74,13 @@ def load_data(filename):
         draws = [int(n) for n in f.readline().split(',')]
         boards = []
         while f.readline():
-            boards.append(Board(
-                [[int(n) for n in f.readline().split()] for _ in range(5)]))
+            boards.append(
+                [[int(n) for n in f.readline().split()] for _ in range(5)])
     return boards, draws
 
 
 if __name__ == '__main__':
     boards, draws = load_data('input.txt')
-    print('part 1:', play_to_win(boards, draws))
-    print('part 2:', play_to_loose(boards, draws))
+    print('part 1:', play_to_win([Board(b) for b in boards], draws))
+    print('part 2:', play_to_loose([Board(b) for b in boards], draws))
 
