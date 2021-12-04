@@ -48,12 +48,11 @@ class Board(Matrix):
 
 def play(boards, draws, play_to_win=True):
     for draw in draws:
+        boards = [b for b in boards if not b.bingo]
         for board in boards:
             board.mark(draw)
             if board.bingo and play_to_win or len(boards) == 1:
                 return draw * board.score()
-            boards = [b for b in boards if not b.bingo]
-            continue
 
 
 def load_data(filename):
@@ -61,13 +60,12 @@ def load_data(filename):
         draws = [int(n) for n in f.readline().split(',')]
         boards = []
         while f.readline():
-            boards.append(
-                [[int(n) for n in f.readline().split()] for _ in range(5)])
+            boards.append([[int(n) for n in f.readline().split()] for _ in range(5)])
     return boards, draws
 
 
 if __name__ == '__main__':
-    boards, draws = load_data('input.txt')
-    print('part 1:', play([Board(b) for b in boards], draws))
-    print('part 2:', play([Board(b) for b in boards], draws, False))
+    boards_data, draws = load_data('input.txt')
+    print('part 1:', play(map(Board, boards_data), draws))
+    print('part 2:', play(map(Board, boards_data), draws, False))
 
