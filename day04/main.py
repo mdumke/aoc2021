@@ -17,9 +17,6 @@ class Matrix(list):
         return ((i, j) for i in range(len(self))
                        for j in range(len(self[0])))
 
-    def transpose(self):
-        return Matrix(zip(*self))
-
     def flatten(self):
         return chain.from_iterable(self)
 
@@ -27,7 +24,7 @@ class Matrix(list):
         return self[row]
 
     def get_col(self, col):
-        return self.transpose()[col]
+        return list(zip(*self))[col]
 
     def find(self, value):
         for i, j in self.indices():
