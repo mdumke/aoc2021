@@ -2,6 +2,7 @@
 
 from collections import defaultdict
 
+
 def get_horizontal_coords(x1, x2, y):
     return [(i, y) for i in range(min(x1, x2), max(x1, x2) + 1)]
 
@@ -9,9 +10,9 @@ def get_vertical_coords(y1, y2, x):
     return [(x, i) for i in range(min(y1, y2), max(y1, y2) + 1)]
 
 def get_diagonal_coords(x1, y1, x2, y2):
-    lx, ly, rx, ry = (x1, y1, x2, y2) if x1 <= x2 else (x2, y2, x1, y1)
-    slope = 1 if ly <= ry else -1
-    return [(lx + i, ly + i * slope) for i in range(rx - lx + 1)]
+    h = 1 if x1 < x2 else -1
+    v = 1 if y1 < y2 else -1
+    return [(x1 + h * i, y1 + v * i) for i in range(abs(x2 - x1) + 1)]
 
 def build_plan(lines, include_diagonals=False):
     plan = defaultdict(int)
@@ -28,6 +29,7 @@ def build_plan(lines, include_diagonals=False):
                 plan[point] += 1
 
     return plan
+
 
 if __name__ == '__main__':
     with open('input.txt') as f:
