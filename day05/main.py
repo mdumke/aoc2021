@@ -18,6 +18,7 @@ def get_diagonal_coords(p1, p2):
     return [(l.x + i, l.y + slope * i) for i in range(r.x-l.x+1)]
 
 def build_map(lines, include_diagonals=False):
+    """returns a lookup of how many lines cover a coordinate"""
     horizontals = [(p1, p2) for p1, p2 in lines if p1.y == p2.y]
     verticals = [(p1, p2) for p1, p2 in lines if p1.x == p2.x]
     diagonals = [(p1, p2) for p1, p2 in lines if p1.x != p2.x and p1.y != p2.y]
@@ -39,13 +40,16 @@ def build_map(lines, include_diagonals=False):
 
     return plan
 
+def read_input(filename):
+    """returns lines in the form [[Point(1, 2), Point(5, 4)], ...]"""
+    with open(filename) as f:
+        return [[Point(*[int(n) for n in p.split(',')])
+                for p in line.strip().split(' -> ')]
+               for line in f.readlines()]
+
 
 if __name__ == '__main__':
-    with open('input.txt') as f:
-        lines = [[Point(*[int(n) for n in p.split(',')])
-                  for p in line.strip().split(' -> ')]
-                 for line in f.readlines()]
-
+    lines = read_input('input.txt')
     print('part 1:', sum([v > 1 for v in build_map(lines).values()]))
     print('part 2:', sum([v > 1 for v in build_map(lines, True).values()]))
 
