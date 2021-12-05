@@ -1,5 +1,6 @@
 """Day 5: Hydrothermal Venture"""
 
+import re
 from collections import defaultdict
 
 
@@ -33,9 +34,9 @@ def build_plan(lines, include_diagonals=False):
 
 if __name__ == '__main__':
     with open('input.txt') as f:
-        lines = [[int(n) for n in [*p1.split(','), *p2.split(',')]]
-                 for p1, p2 in [l.strip().split(' -> ') for l in f.readlines()]]
+        lines = [[int(n) for n in re.findall(r'(\d+),(\d+) -> (\d+),(\d+)', line)[0]]
+                 for line in f.readlines()]
 
-    print('part 1:', sum([v > 1 for v in build_plan(lines).values()]))
-    print('part 2:', sum([v > 1 for v in build_plan(lines, True).values()]))
+    print('part 1:', sum([count > 1 for count in build_plan(lines).values()]))
+    print('part 2:', sum([count > 1 for count in build_plan(lines, True).values()]))
 
