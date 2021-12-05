@@ -37,6 +37,6 @@ if __name__ == '__main__':
         lines = [[int(n) for n in re.findall(r'(\d+),(\d+) -> (\d+),(\d+)', line)[0]]
                  for line in f.readlines()]
 
-    print('part 1:', sum([count > 1 for count in build_plan(lines).values()]))
-    print('part 2:', sum([count > 1 for count in build_plan(lines, True).values()]))
+    print('part 1:', sum(count > 1 for count in build_plan(lines).values()))
+    print('part 2:', sum(count > 1 for count in build_plan(lines, True).values()))
 
