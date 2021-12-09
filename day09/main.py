@@ -3,16 +3,17 @@
 from functools import reduce
 from operator import mul
 
+def is_valid_position(cave, i, j):
+    return i >= 0 and i < len(cave) and \
+           j >= 0 and j < len(cave[0])
+
 def neighbors(cave, i, j):
-    o = []
-    if i > 0: o.append((i-1, j))
-    if j > 0: o.append((i, j-1))
-    if i < len(cave)-1: o.append((i+1, j))
-    if j < len(cave[0])-1: o.append((i, j+1))
-    return o
+    return [(i+x, j+y) for x, y in [(-1, 0), (1, 0), (0, -1), (0, 1)]
+                       if is_valid_position(cave, i+x, j+y)]
 
 def is_low_point(cave, i, j):
-    return all(cave[x][y] > cave[i][j] for x, y in neighbors(cave, i, j))
+    return all(cave[x][y] > cave[i][j]
+               for x, y in neighbors(cave, i, j))
 
 def grow_basin(cave, i, j, basin):
     basin.add((i, j))
@@ -31,7 +32,8 @@ def get_total_risk_level(cave):
     return sum(map_low_points(cave, lambda i, j, h: 1 + h))
 
 def get_basin_sizes(cave):
-    return sorted(map_low_points(cave, lambda i, j, h: len(grow_basin(cave, i, j, set()))))
+    return sorted(map_low_points(cave, lambda i, j, h:
+        len(grow_basin(cave, i, j, set()))))
 
 
 if __name__ == '__main__':
