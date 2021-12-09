@@ -3,7 +3,7 @@
 from functools import reduce
 from operator import mul
 
-def neighbor_pos(cave, i, j):
+def neighbors(cave, i, j):
     o = []
     if i > 0: o.append((i-1, j))
     if j > 0: o.append((i, j-1))
@@ -12,12 +12,11 @@ def neighbor_pos(cave, i, j):
     return o
 
 def is_low_point(cave, i, j):
-    neighbors = [cave[x][y] for x, y in neighbor_pos(cave, i, j)]
-    return all(height > cave[i][j] for height in neighbors)
+    return all(cave[x][y] > cave[i][j] for x, y in neighbors(cave, i, j))
 
 def grow_basin(cave, i, j, basin):
     basin.add((i, j))
-    for x, y in neighbor_pos(cave, i, j):
+    for x, y in neighbors(cave, i, j):
         if cave[x][y] > cave[i][j] and cave[x][y] < '9':
             grow_basin(cave, x, y, basin)
     return basin
