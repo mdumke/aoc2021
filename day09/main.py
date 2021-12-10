@@ -1,7 +1,6 @@
 """Day 9: Smoke Basin"""
 
-from functools import reduce
-from operator import mul
+from math import prod
 
 def is_valid_position(cave, i, j):
     return i >= 0 and i < len(cave) and \
@@ -41,4 +40,4 @@ if __name__ == '__main__':
         cave = f.read().splitlines()
 
     print('part 1:', get_total_risk_level(cave))
-    print('part 2:', reduce(mul, get_basin_sizes(cave)[-3:]))
+    print('part 2:', prod(get_basin_sizes(cave)[-3:]))
