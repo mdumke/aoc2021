@@ -1,17 +1,14 @@
 """Day 10: Syntax Scoring"""
 
-complements = {'(': ')', '[': ']', '{': '}', '<': '>'}
-corruption_scores = {')': 3, ']': 57, '}': 1197, '>': 25137}
-incomplete_scores ={')': 1, ']': 2, '}': 3, '>': 4}
 
 def check_syntax(line):
+    complements = dict(['()', '[]', '{}', '<>'])
     stack = []
     for char in line:
         if char in complements:
             stack.append(char)
         else:
             bracket = stack.pop()
-
             if char != complements[bracket]:
                 return char, None
     return None, stack
@@ -21,14 +18,14 @@ def compute_corruption_score(lines):
     for line in lines:
         char, stack = check_syntax(line)
         if char:
-            total += corruption_scores[char]
+            total += [3, 57, 1197, 25137][')]}>'.index(char)]
     return total
 
 def score_helper(stack):
     score = 0
     while len(stack):
         score *= 5
-        score += incomplete_scores[complements[stack.pop()]]
+        score += '([{<'.index(stack.pop()) + 1
     return score
 
 def compute_incomplete_score(lines):
