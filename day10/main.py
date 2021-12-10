@@ -1,18 +1,17 @@
 """Day 10: Syntax Scoring"""
 
-from collections import deque
-
 complements = {'(': ')', '[': ']', '{': '}', '<': '>'}
 corruption_scores = {')': 3, ']': 57, '}': 1197, '>': 25137}
 incomplete_scores ={')': 1, ']': 2, '}': 3, '>': 4}
 
 def check_syntax(line):
-    stack = deque()
-    for i, char in enumerate(line):
+    stack = []
+    for char in line:
         if char in complements:
             stack.append(char)
         else:
             bracket = stack.pop()
+
             if char != complements[bracket]:
                 return char, None
     return None, stack
@@ -20,7 +19,7 @@ def check_syntax(line):
 def compute_corruption_score(lines):
     total = 0
     for line in lines:
-        char, _ = check_syntax(line)
+        char, stack = check_syntax(line)
         if char:
             total += corruption_scores[char]
     return total
