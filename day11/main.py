@@ -4,6 +4,12 @@ def positions(grid):
     return ((i, j) for i in range(len(grid))
                    for j in range(len(grid[0])))
 
+def sum2d(grid):
+    return sum(sum(row) for row in grid)
+
+def count(grid, value):
+    return sum(1 for i, j in positions(grid) if grid[i][j] == value)
+
 def increment(grid):
     for i, j in positions(grid):
         grid[i][j] += 1
@@ -32,28 +38,26 @@ def flash_at(grid, i, j):
         grid[x][y] += 1
     return [(x, y) for x, y in neighbors(grid, i, j) if grid[x][y] > 9]
 
-def step(grid):
-    increment(grid)
+def flash(grid):
     pos = flash_positions(grid)
-    flash_count = 0
     while len(pos):
         i, j = pos.pop()
         if grid[i][j] is not None:
-            flash_count += 1
             pos += flash_at(grid, i, j)
+
+def step(grid):
+    increment(grid)
+    flash(grid)
     set_zeros(grid)
-    return flash_count
+    return count(grid, 0)
 
 def count_flashes(grid, steps):
     return sum(step(grid) for _ in range(steps))
 
-def in_sync(grid):
-    return sum(sum(row) for row in grid) == 0
-
 def find_first_sync(grid):
     for n in range(1, 10000):
         step(grid)
-        if in_sync(grid):
+        if sum2d(grid) == 0:
             return n
 
 def load_grid(filename):
