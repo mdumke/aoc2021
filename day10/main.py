@@ -1,7 +1,6 @@
 """Day 10: Syntax Scoring"""
 
-def median(numbers):
-    return sorted(numbers)[len(numbers) // 2]
+from statistics import median
 
 def check_syntax(line):
     stack = []
