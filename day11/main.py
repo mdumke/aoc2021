@@ -6,59 +6,57 @@ def size(grid):
 def positions(grid):
     return ((i, j) for i in range(len(grid)) for j in range(len(grid[0])))
 
-def find(grid, value):
-    return [(i, j) for i, j in positions(grid) if grid[i][j] == value]
+def find(value, grid):
+    return ((i, j) for i, j in positions(grid) if grid[i][j] == value)
 
-def count(grid, value):
-    return len(find(grid, value))
+def count(value, grid):
+    return len(list(find(value, grid)))
 
-def increment(grid):
-    for i, j in positions(grid):
-        grid[i][j] += 1
-
-def get_flash_positions(grid):
-    return [(i, j) for i, j in positions(grid) if grid[i][j] > 9]
-
-def replace(grid, v1, v2):
-    for i, j in find(grid, v1):
+def replace(v1, v2, grid):
+    for i, j in find(v1, grid):
         grid[i][j] = v2
 
-def is_valid(grid, i, j):
+def increment_at(positions, grid):
+    for i, j in positions:
+        grid[i][j] += 1
+
+def is_valid(i, j, grid):
     return i >= 0 and i < len(grid) and \
            j >= 0 and j < len(grid[0]) and \
            grid[i][j] is not None
 
-def neighbors(grid, i, j):
-    return filter(lambda pos: is_valid(grid, *pos),
+def get_neighbors(i, j, grid):
+    return filter(lambda pos: is_valid(*pos, grid),
                  ((i-1, j-1), (i-1, j), (i-1, j+1), (i, j-1), (i, j+1),
                   (i+1, j-1), (i+1, j), (i+1, j+1)))
 
-def flash_at(grid, i, j):
-    grid[i][j] = None
-    for x, y in neighbors(grid, i, j):
-        grid[x][y] += 1
-    return [(x, y) for x, y in neighbors(grid, i, j) if grid[x][y] > 9]
+def should_flash(positions, grid):
+    return set((i, j) for i, j in positions if grid[i][j] > 9)
 
 def flash(grid):
-    pos = get_flash_positions(grid)
-    while len(pos):
-        i, j = pos.pop()
-        if grid[i][j] is not None:
-            pos += flash_at(grid, i, j)
+    to_flash = should_flash(positions(grid), grid)
+    while len(to_flash):
+        i, j = to_flash.pop()
+        grid[i][j] = None
+        increment_at(get_neighbors(i, j, grid), grid)
+        to_flash.update(should_flash(get_neighbors(i, j, grid), grid))
 
 def step(grid):
-    increment(grid)
+    increment_at(positions(grid), grid)
     flash(grid)
-    replace(grid, None, 0)
-    return count(grid, 0)
+    replace(None, 0, grid)
 
 def count_flashes(grid, steps):
-    return sum(step(grid) for _ in range(steps))
+    flash_count = 0
+    for _ in range(steps):
+        step(grid)
+        flash_count += count(0, grid)
+    return flash_count
 
 def find_first_sync(grid):
     for n in range(1, 10000):
         step(grid)
-        if count(grid, 0) == size(grid):
+        if count(0, grid) == size(grid):
             return n
 
 def load_grid(filename):
