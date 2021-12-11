@@ -1,26 +1,27 @@
 """Day 11: Dumbo Octopus"""
 
-def positions(grid):
-    return ((i, j) for i in range(len(grid))
-                   for j in range(len(grid[0])))
+def size(grid):
+    return len(grid) * len(grid[0])
 
-def sum2d(grid):
-    return sum(sum(row) for row in grid)
+def positions(grid):
+    return ((i, j) for i in range(len(grid)) for j in range(len(grid[0])))
+
+def find(grid, value):
+    return [(i, j) for i, j in positions(grid) if grid[i][j] == value]
 
 def count(grid, value):
-    return sum(1 for i, j in positions(grid) if grid[i][j] == value)
+    return len(find(grid, value))
 
 def increment(grid):
     for i, j in positions(grid):
         grid[i][j] += 1
 
-def flash_positions(grid):
+def get_flash_positions(grid):
     return [(i, j) for i, j in positions(grid) if grid[i][j] > 9]
 
-def set_zeros(grid):
-    for i, j in positions(grid):
-        if grid[i][j] is None:
-            grid[i][j] = 0
+def replace(grid, v1, v2):
+    for i, j in find(grid, v1):
+        grid[i][j] = v2
 
 def is_valid(grid, i, j):
     return i >= 0 and i < len(grid) and \
@@ -39,7 +40,7 @@ def flash_at(grid, i, j):
     return [(x, y) for x, y in neighbors(grid, i, j) if grid[x][y] > 9]
 
 def flash(grid):
-    pos = flash_positions(grid)
+    pos = get_flash_positions(grid)
     while len(pos):
         i, j = pos.pop()
         if grid[i][j] is not None:
@@ -48,7 +49,7 @@ def flash(grid):
 def step(grid):
     increment(grid)
     flash(grid)
-    set_zeros(grid)
+    replace(grid, None, 0)
     return count(grid, 0)
 
 def count_flashes(grid, steps):
@@ -57,7 +58,7 @@ def count_flashes(grid, steps):
 def find_first_sync(grid):
     for n in range(1, 10000):
         step(grid)
-        if sum2d(grid) == 0:
+        if count(grid, 0) == size(grid):
             return n
 
 def load_grid(filename):
