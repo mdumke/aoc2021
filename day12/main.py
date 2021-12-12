@@ -3,8 +3,8 @@
 from collections import defaultdict
 
 
-def find_paths(caves, visit_twice=False):
-    to_explore = [('start', [], not visit_twice)]
+def find_paths(caves, should_visit_twice=False):
+    to_explore = [('start', [], False)]
     paths = []
 
     while len(to_explore):
@@ -15,7 +15,7 @@ def find_paths(caves, visit_twice=False):
             continue
 
         if current.islower() and current in path:
-            if current == 'start' or visited_twice:
+            if not should_visit_twice or current == 'start' or visited_twice:
                 continue
             visited_twice = True
 
