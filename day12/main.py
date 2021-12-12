@@ -1,45 +1,42 @@
 """Day 12: Passage Pathing"""
 
-def find_paths(caves, without_repetition=True):
+from collections import defaultdict
+
+
+def find_paths(caves, visit_twice=False):
+    to_explore = [('start', [], not visit_twice)]
     paths = []
-    fringe = [('start', [], without_repetition)]
 
-    while len(fringe):
-        cave, path, free_visit_complete = fringe.pop()
+    while len(to_explore):
+        current, path, visited_twice = to_explore.pop()
 
-        if cave == 'end':
-            paths.append([*path, cave])
+        if current == 'end':
+            paths.append([*path, current])
             continue
 
-        if cave.islower() and cave in path and free_visit_complete:
-            continue
+        if current.islower() and current in path:
+            if current == 'start' or visited_twice:
+                continue
+            visited_twice = True
 
-        if cave.islower() and cave in path:
-            free_visit_complete = True
-
-        for neighbor in caves[cave]:
-            if neighbor != 'start':
-                fringe.append([neighbor, [*path, cave], free_visit_complete])
+        to_explore.extend(
+            [(c, [*path, current], visited_twice) for c in caves[current]])
 
     return paths
 
-def load_cave_plan(filename):
-    with open(filename) as f:
-        edges = [l.split('-') for l in f.read().splitlines()]
 
-    caves = {}
-
+def build_graph(edges):
+    caves = defaultdict(list)
     for n1, n2 in edges:
-        if not caves.get(n1): caves[n1] = []
-        if not caves.get(n2): caves[n2] = []
         caves[n1].append(n2)
         caves[n2].append(n1)
-
     return caves
 
 
 if __name__ == '__main__':
-    caves = load_cave_plan('input.txt')
+    with open('input.txt') as f:
+        caves = build_graph([l.split('-') for l in f.read().splitlines()])
+
     print('part 1:', len(find_paths(caves)))
-    print('part 2:', len(find_paths(caves, False)))
+    print('part 2:', len(find_paths(caves, True)))
 
