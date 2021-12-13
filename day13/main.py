@@ -1,39 +1,38 @@
 """Day 13: Transparent Origami"""
 
 import re
+from functools import reduce
 
-def map_set(s, fn):
-    return set(fn(e) for e in s)
+def matrix_to_str(m):
+    return '\n'.join(''.join(row) for row in m)
 
 def fold_coord(x, y, axis, line):
-    if axis == 'x' and x > line: x = 2 * line - x
-    if axis == 'y' and y > line: y = 2 * line - y
-    return (x, y)
+    return 2 * line - x if axis == 'x' and x > line else x, \
+           2 * line - y if axis == 'y' and y > line else y
 
-def fold(axis, line, dots):
-    return map_set(dots, lambda c: fold_coord(*c, axis, line))
+def fold(dots, instruction):
+    return set(fold_coord(x, y, *instruction) for x, y in dots)
 
 def fold_all(folds, dots):
-    d = dots.copy()
-    for axis, line in folds:
-        d = fold(axis, line, d)
-    return d
+    return reduce(fold, folds, dots)
 
-def display(dots):
+def get_axes(dots):
     xs = [x for x, _ in dots]
     ys = [y for _, y in dots]
-    screen = [[' '] * (max(xs) - min(xs) + 1)
-              for _ in range(max(ys) - min(ys) + 1)]
-    for x, y in dots:
-        screen[y][x] = '#'
-    return '\n'.join([''.join(line) for line in screen])
+    return range(min(xs), max(xs)+1), \
+           range(min(ys), max(ys)+1)
+
+def display(dots):
+    return matrix_to_str([[' #'[(x, y) in dots]
+                           for x in get_axes(dots)[0]]
+                          for y in get_axes(dots)[1]])
 
 def load_instructions(filename):
     with open(filename) as f:
         dots, folds = f.read().split('\n\n')
 
     dots = set(tuple(int(n) for n in l.split(',')) for l in dots.splitlines())
-    folds = [(a, int(n)) for a, n in re.findall(r'([xy])=(\d+)', folds)]
+    folds = [(ax, int(n)) for ax, n in re.findall(r'([xy])=(\d+)', folds)]
 
     return dots, folds
 
@@ -41,6 +40,6 @@ def load_instructions(filename):
 if __name__ == '__main__':
     dots, folds = load_instructions('input.txt')
 
-    print('part 1:', len(fold(*folds[0], dots)))
+    print('part 1:', len(fold(dots, folds[0])))
     print('part 2:', '\n' + display(fold_all(folds, dots)))
 
