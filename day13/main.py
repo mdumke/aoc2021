@@ -13,9 +13,6 @@ def fold_coord(x, y, axis, line):
 def fold(dots, instruction):
     return set(fold_coord(x, y, *instruction) for x, y in dots)
 
-def fold_all(folds, dots):
-    return reduce(fold, folds, dots)
-
 def get_axes(dots):
     xs = [x for x, _ in dots]
     ys = [y for _, y in dots]
@@ -38,8 +35,7 @@ def load_instructions(filename):
 
 
 if __name__ == '__main__':
-    dots, folds = load_instructions('input.txt')
-
-    print('part 1:', len(fold(dots, folds[0])))
-    print('part 2:', '\n' + display(fold_all(folds, dots)))
+    dots, instructions = load_instructions('input.txt')
+    print('part 1:', len(fold(dots, instructions[0])))
+    print('part 2:\n', display(reduce(fold, instructions, dots)))
 
