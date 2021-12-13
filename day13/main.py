@@ -14,10 +14,8 @@ def fold(dots, instruction):
     return set(fold_coord(x, y, *instruction) for x, y in dots)
 
 def get_axes(dots):
-    xs = [x for x, _ in dots]
-    ys = [y for _, y in dots]
-    return range(min(xs), max(xs)+1), \
-           range(min(ys), max(ys)+1)
+    return range(max(x for x, _ in dots) + 1), \
+           range(max(y for _, y in dots) + 1)
 
 def display(dots):
     return matrix_to_str([[' #'[(x, y) in dots]
@@ -28,7 +26,7 @@ def load_instructions(filename):
     with open(filename) as f:
         dots, folds = f.read().split('\n\n')
 
-    dots = set(tuple(int(n) for n in l.split(',')) for l in dots.splitlines())
+    dots = set(tuple(map(int, l.split(','))) for l in dots.splitlines())
     folds = [(ax, int(n)) for ax, n in re.findall(r'([xy])=(\d+)', folds)]
 
     return dots, folds
