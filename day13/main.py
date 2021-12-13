@@ -2,17 +2,16 @@
 
 import re
 
+def map_set(s, fn):
+    return set(fn(e) for e in s)
+
+def fold_coord(x, y, axis, line):
+    if axis == 'x' and x > line: x = 2 * line - x
+    if axis == 'y' and y > line: y = 2 * line - y
+    return (x, y)
 
 def fold(axis, line, dots):
-    res = set()
-    for x, y in dots:
-        if axis == 'x' and x > line:
-            res.add((2 * line - x, y))
-        elif axis == 'y' and y > line:
-            res.add((x, 2 * line - y))
-        else:
-            res.add((x, y))
-    return res
+    return map_set(dots, lambda c: fold_coord(*c, axis, line))
 
 def fold_all(folds, dots):
     d = dots.copy()
@@ -34,7 +33,7 @@ def load_instructions(filename):
         dots, folds = f.read().split('\n\n')
 
     dots = set(tuple(int(n) for n in l.split(',')) for l in dots.splitlines())
-    folds = [(c, int(n)) for c, n in re.findall(r'([xy])=(\d+)', folds)]
+    folds = [(a, int(n)) for a, n in re.findall(r'([xy])=(\d+)', folds)]
 
     return dots, folds
 
