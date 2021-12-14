@@ -1,35 +1,37 @@
 """Day 14: Extended Polymerization"""
 
 from collections import defaultdict
+from functools import reduce
 
 def step(counts, rules):
     next_counts = defaultdict(int)
-
     for pair, count in counts.items():
-        if rules.get(pair):
-            next_counts[pair[0] + rules[pair]] += count
-            next_counts[rules[pair] + pair[1]] += count
-        else:
-            next_counts[pair] = 1
-
+        next_counts[pair[0] + rules[pair]] += count
+        next_counts[rules[pair] + pair[1]] += count
     return next_counts
 
 def iterate(counts, rules, steps):
-    c = counts.copy()
-    for _ in range(steps):
-        c = step(c, rules)
-    return c
+    return reduce(lambda counts, _: step(counts, rules), range(steps), counts)
 
-def get_char_counts(counts):
+def get_char_counts(pair_counts):
     char_counts = defaultdict(int)
-    for (a, _), count in counts.items():
-        if a != ' ':
-            char_counts[a] += count
+    for (char, _), pair_count in pair_counts.items():
+        char_counts[char] += pair_count
     return char_counts
 
+def count_pairs(template, rules):
+    pairs = defaultdict(int)
+    for a, b in list(zip(template, template[1:])):
+        pairs[a + b] += 1
+    return pairs
+
+def get_element_counts(template, rules, n_iterations):
+    counts = get_char_counts(iterate(count_pairs(template, rules), rules, n_iterations))
+    counts[template[-1]] += 1
+    return counts
+
 def max_diff(counts):
-    return sorted(counts.values())[-1] - \
-           sorted(counts.values())[0]
+    return max(counts.values()) - min(counts.values())
 
 
 if __name__ == '__main__':
@@ -37,12 +39,5 @@ if __name__ == '__main__':
         template, rules = f.read().split('\n\n')
         rules = dict((r[:2], r[-1]) for r in rules.splitlines())
 
-    counts = dict.fromkeys(rules.keys(), 0)
-    for a, b in list(zip(template, template[1:])):
-        counts[a + b] += 1
-
-    counts[' ' + template[0]] = 1
-    counts[template[-1] + ' '] = 1
-
-    print('part 1:', max_diff(get_char_counts(iterate(counts, rules, 10))))
-    print('part 2:', max_diff(get_char_counts(iterate(counts, rules, 40))))
+    print('part 1:', max_diff(get_element_counts(template, rules, 10)))
+    print('part 2:', max_diff(get_element_counts(template, rules, 40)))
