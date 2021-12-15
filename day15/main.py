@@ -2,23 +2,23 @@
 
 from heapq import heappush, heappop
 
-def increment(grid):
-    return [[(v % 9) + 1 for v in l] for l in grid]
-
-def extend_right(grid1, grid2):
-    return [l1 + l2 for l1, l2 in zip(grid1, increment(grid2))]
-
-def extend_down(grid1, grid2):
-    return grid1 + increment(grid2)
-
 def extend_cave(c):
-    c = extend_right(c, extend_right(c, extend_right(c, extend_right(c, c))))
-    c = extend_down(c, extend_down(c, extend_down(c, extend_down(c, c))))
-    return c
+    def inc(grid):
+        return [[(v % 9) + 1 for v in l] for l in grid]
+
+    def right(grid1, grid2):
+        return [l1 + l2 for l1, l2 in zip(grid1, inc(grid2))]
+
+    def down(grid1, grid2):
+        return grid1 + inc(grid2)
+
+    c = right(c, right(c, right(c, right(c, c))))
+    return down(c, down(c, down(c, down(c, c))))
 
 def get_neighbors(x, y, cave):
-    return ((i, j) for (i, j) in ((x, y - 1), (x - 1, y), (x + 1, y), (x, y + 1))
-                   if 0 <= i < len(cave) and 0 <= j < len(cave))
+    return ((x + i, y + j)
+            for (i, j) in ((0, -1), (-1, 0), (1, 0), (0, 1))
+            if 0 <= x + i < len(cave) and 0 <= y + j < len(cave))
 
 def find_lowest_risk(cave):
     fringe = [(0, (0, 0))]
