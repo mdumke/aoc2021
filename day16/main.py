@@ -1,20 +1,16 @@
 """Packet Decoder"""
 
-import math
-from operator import gt, lt
+from math import prod
 
-def hex_to_bin(n):
-    return ''.join([str(bin(int(i, base=16)))[2:].rjust(4, '0') for i in n])
+def hex_to_bin(msg):
+    return ''.join(str(bin(int(n, base=16)))[2:].rjust(4, '0') for n in msg)
 
 def decode_literal(bits):
     lit = ''
-    i = 0
-    while True:
+    for i in range(0, len(bits), 5):
         lit += bits[i+1:i+5]
-        i += 5
-        if bits[i-5] == '0':
-            break
-    return int(lit, 2), i
+        if bits[i] == '0':
+            return int(lit, 2), i + 5
 
 def decode_packet(bits):
     version = int(bits[:3], 2)
@@ -24,27 +20,17 @@ def decode_packet(bits):
     version_sum += version
 
     if type_id == 4:
-        n, offset = decode_literal(bits[6:])
-        return n, offset + 6
+        result, offset = decode_literal(bits[6:])
     else:
         ns, offset = decode_packet_list(bits[6:])
-
-        if type_id == 0:
-            result = sum(ns)
-        if type_id == 1:
-            result = math.prod(ns)
-        if type_id == 2:
-            result = min(ns)
-        if type_id == 3:
-            result = max(ns)
-        if type_id == 5:
-            result = gt(*ns)
-        if type_id == 6:
-            result = lt(*ns)
-        if type_id == 7:
-            result = ns[0] == ns[1]
-
-        return result, 6 + offset
+        if type_id == 0: result = sum(ns)
+        if type_id == 1: result = prod(ns)
+        if type_id == 2: result = min(ns)
+        if type_id == 3: result = max(ns)
+        if type_id == 5: result = ns[0] > ns[1]
+        if type_id == 6: result = ns[0] < ns[1]
+        if type_id == 7: result = ns[0] == ns[1]
+    return result, 6 + offset
 
 def decode_packet_list(bits):
     if int(bits[0], 2) == 0:
@@ -53,26 +39,19 @@ def decode_packet_list(bits):
         return ns, 16 + offset
     else:
         n_sub = int(bits[1:12], 2)
-        ns, offset = decode_group(bits[12:], n_sub)
+        ns, offset = decode_sequence(bits[12:], n_sub)
         return ns, 12 + offset
 
-def decode_sequence(bits):
+def decode_sequence(bits, size=None):
+    offset = 0
     values = []
-    i = 0
-    while i < len(bits):
-        v, offset = decode_packet(bits[i:])
-        i += offset
+    packet = 0
+    while offset < len(bits) if size is None else packet < size:
+        v, i = decode_packet(bits[offset:])
+        offset += i
         values.append(v)
-    return values, i
-
-def decode_group(bits, size):
-    i = 0
-    values = []
-    for packet in range(size):
-        v, offset = decode_packet(bits[i:])
-        i += offset
-        values.append(v)
-    return values, i
+        packet += 1
+    return values, offset
 
 
 if __name__ == '__main__':
