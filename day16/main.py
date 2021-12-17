@@ -43,14 +43,14 @@ def decode_packet_list(bits):
         return ns, 12 + offset
 
 def decode_sequence(bits, size=None):
-    offset = 0
     values = []
+    offset = 0
     packet = 0
     while offset < len(bits) if size is None else packet < size:
         v, i = decode_packet(bits[offset:])
         offset += i
-        values.append(v)
         packet += 1
+        values.append(v)
     return values, offset
 
 
