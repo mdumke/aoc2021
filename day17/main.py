@@ -36,19 +36,10 @@ def fire(vx, vy, target):
 
 
 def find_hit_velocities(target):
-    hits = []
-
-    for vy in range(-100, 100):
-        for vx in range(1, 10000):
-            response, max_y = fire(vx, vy, target)
-
-            if response == 'hit':
-                hits.append(max_y)
-
-            if response == 'pass':
-                break
-
-    return hits
+   scan = [fire(vx, vy, target)
+           for vx in range(1, 1000)
+           for vy in range(-100, 100)]
+   return [y for res, y in scan if res == 'hit']
 
 
 if __name__ == '__main__':
