@@ -25,8 +25,8 @@ def adjust_scanner(scanner1, scanner2):
     for tf in transformers():
         scanner2_tf = scanner2 @ tf
 
-        for target in scanner1:
-            for candidate in scanner2_tf:
+        for target in scanner1[:-11]:
+            for candidate in scanner2_tf[:-11]:
                 candidate_set = readings_as_set(scanner2_tf + target - candidate)
 
                 overlap = target_set & candidate_set
