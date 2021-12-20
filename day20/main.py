@@ -3,24 +3,14 @@
 def enhance(algorithm):
     return lambda window: algorithm[int(''.join(window), 2)]
 
+def valid_index(i, j, matrix):
+    return 0 <= i < len(matrix) and \
+           0 <= j < len(matrix[0])
+
 def get_window(img, i, j, fill_value):
-    window = []
-
-    for x in (-1, 0, 1):
-        if 0 <= i + x < len(img):
-            row = ''
-
-            for y in (-1, 0, 1):
-                if 0 <= j + y < len(img[0]):
-                    row += img[i+x][j+y]
-                else:
-                    row += fill_value
-
-            window.append(row)
-        else:
-            window.append(str(fill_value) * 3)
-
-    return window
+    return [''.join([img[x][y] if valid_index(x, y, img) else fill_value
+             for y in (j-1, j, j+1)])
+            for x in (i-1, i, i+1)]
 
 def convolve(img, fill_value, fn):
     return [''.join(fn(get_window(img, i, j, fill_value))
@@ -42,3 +32,4 @@ if __name__ == '__main__':
 
     print('part 1:', ''.join(enhance_image(img, 2)).count('1'))
     print('part 2:', ''.join(enhance_image(img, 50)).count('1'))
+
