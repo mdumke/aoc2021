@@ -17,10 +17,10 @@ def convolve(img, fill_value, fn):
              for j in range(-1, len(img) + 1))
             for i in range(-1, len(img[0]) + 1)]
 
-def enhance_image(img, n):
+def enhance_image(img, n, enhancer):
     fill = '0'
     for _ in range(n):
-        img = convolve(img, fill, enhance(algorithm))
+        img = convolve(img, fill, enhancer)
         fill = algorithm[int(fill * 9, 2)]
     return img
 
@@ -30,6 +30,6 @@ if __name__ == '__main__':
         algorithm = f.readline().strip().replace('#', '1').replace('.', '0')
         img = [l.replace('#', '1').replace('.', '0') for l in f.read().strip().splitlines()]
 
-    print('part 1:', ''.join(enhance_image(img, 2)).count('1'))
-    print('part 2:', ''.join(enhance_image(img, 50)).count('1'))
+    print('part 1:', ''.join(enhance_image(img, 2, enhance(algorithm))).count('1'))
+    print('part 2:', ''.join(enhance_image(img, 50, enhance(algorithm))).count('1'))
 
