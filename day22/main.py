@@ -3,6 +3,7 @@
 import re
 from tqdm import tqdm
 from dataclasses import dataclass
+from itertools import chain
 
 
 @dataclass
@@ -23,6 +24,11 @@ class Cube:
 
     def copy(self, **overrides):
         return Cuboid(**{**self.__dict__, **overrides})
+
+
+def flatten(list_of_lists):
+    """flatten one level of nesting"""
+    return chain.from_iterable(list_of_lists)
 
 
 def find_overlap(c1, c2) -> Cube:
@@ -59,27 +65,17 @@ def shatter(cube, fixed):
     return [c for c in cubes if c != overlap]
 
 
-def add(cube, switched_on):
-    """insert the cube into all cubes that are already on"""
+def add(cube, active):
+    """insert the cube into all cubes that are already active"""
     new_cubes = [cube]
-
-    for fixed in switched_on:
-        tmp = []
-        for c in new_cubes:
-            tmp.extend(shatter(c, fixed))
-        new_cubes = tmp
-
-    return [*switched_on, *new_cubes]
+    for fixed in active:
+        new_cubes = flatten([shatter(c, fixed) for c in new_cubes])
+    return [*active, *new_cubes]
 
 
-def remove(cube, switched_on):
+def remove(cube, active):
     """discard the regions where the cube overlaps with activated cubes"""
-    still_on = []
-
-    for c in switched_on:
-        still_on.extend(shatter(c, cube))
-
-    return still_on
+    return list(flatten(shatter(c, cube) for c in active))
 
 
 def is_small(cube):
@@ -93,10 +89,7 @@ def reboot(steps):
     """returns a list of cubic regions that are activated"""
     active = [steps[0]]
     for cube in tqdm(steps[1:]):
-        if cube.on:
-            active = add(cube, active)
-        else:
-            active = remove(cube, active)
+        active = add(cube, active) if cube.on else remove(cube, active)
     return active
 
 
