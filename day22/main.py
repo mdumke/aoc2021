@@ -93,7 +93,7 @@ def reboot(steps):
     return active
 
 
-def count_status_on(cubes):
+def count_active(cubes):
     """returns the total activate area"""
     return sum(cube.size for cube in cubes)
 
@@ -110,6 +110,6 @@ if __name__ == '__main__':
         steps = [parse(l) for l in f.read().splitlines()]
         small_steps = [s for s in steps if is_small(s)]
 
-    print('part 1:', count_status_on(reboot(small_steps)))
-    print('part 2:', count_status_on(reboot(steps)))
+    print('part 1:', count_active(reboot(small_steps)))
+    print('part 2:', count_active(reboot(steps)))
 
